@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>生日祝福</title>
+    <style>
+        /* 基础样式 - 使用相对单位 */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            overflow: hidden;
+            position: relative;
+        }
+        h1 {
+            font-size: 4rem;
+            color: yellow;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00;
+            text-align: center;
+            line-height: 1.2;
+            max-width: 90vw;
+        }
+        button {
+            font-size: 1.125rem;
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: #8B4513;
+            background-color: yellow;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 15px #ffcc00;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+            will-change: transform;
+            margin-bottom: 120px;
+        }
+        button:hover {
+            background-color: #ffff99;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #ffff00;
+        }
+        /* 蛋糕样式 - 放大尺寸+提高层级+增强发光 */
+        .cake {
+            position: relative;
+            width: 280px;
+            height: 200px;
+            z-index: 8;
+        }
+        /* 蛋糕底座 */
+        .cake-base {
+            position: absolute;
+            bottom: 0;
+            width: 280px;
+            height: 120px;
+            background-color: #d68853;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 0 25px #d68853;
+        }
+        /* 蛋糕奶油层 */
+        .cake-cream {
+            position: absolute;
+            bottom: 100px;
+            width: 240px;
+            height: 60px;
+            background-color: #ffd700;
+            left: 20px;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 0 20px #ffd700;
+        }
+        /* 蛋糕装饰 */
+        .cake-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .decoration-dot {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff0000;
+        }
+        /* 为装饰点设置默认位置 */
+        .cake-decoration .decoration-dot:nth-child(1) { top: 40px; left: 40px; }
+        .cake-decoration .decoration-dot:nth-child(2) { top: 50px; left: 100px; }
+        .cake-decoration .decoration-dot:nth-child(3) { top: 30px; left: 160px; }
+        .cake-decoration .decoration-dot:nth-child(4) { top: 60px; left: 220px; }
+        .cake-decoration .decoration-dot:nth-child(5) { top: 90px; left: 70px; }
+        .cake-decoration .decoration-dot:nth-child(6) { top: 80px; left: 200px; }
+        /* 蜡烛 - 放大尺寸 */
+        .candle {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 50px;
+            background-color: #ff6b6b;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 0 15px #ff6b6b;
+            z-index: 9;
+        }
+        /* 火焰 - 放大+增强发光 */
+        .flame {
+            position: absolute;
+            top: -55px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 30px;
+            background: radial-gradient(circle, #ffff00 0%, #ff9900 70%, #ff6600 100%);
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 20px #ffff00, 0 0 30px #ff9900;
+            animation: flame-flicker 1s infinite alternate;
+        }
+        /* 火焰闪烁动画 */
+        @keyframes flame-flicker {
+            0% {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) scale(1.2);
+                opacity: 0.9;
+            }
+        }
+        .firework {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 1.8s ease-out;
+            pointer-events: none;
+            will-change: left, top, opacity;
+            z-index: 5;
+        }
+        /* 移除线条爆炸特效的CSS样式 */
+        /* .firework-thread {
+            position: absolute;
+            background: #ffd700;
+            opacity: 0;
+            transition: all 0.8s ease-out;
+            pointer-events: none;
+            transform-origin: 0% 50%;
+            will-change: width, opacity;
+            z-index: 6;
+        } */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 1;
+            pointer-events: none;
+            transition: all 0.8s ease-out;
+            will-change: left, top, opacity, transform;
+            z-index: 7;
+        }
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+        
+        /* 媒体查询 - 针对移动设备 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 30px;
+            }
+            button {
+                font-size: 1rem;
+                padding: 12px 24px;
+                margin-bottom: 80px;
+            }
+            .cake {
+                width: 200px;
+                height: 140px;
+            }
+            .cake-base {
+                width: 200px;
+                height: 85px;
+            }
+            .cake-cream {
+                bottom: 70px;
+                width: 170px;
+                height: 40px;
+                left: 15px;
+            }
+            .decoration-dot {
+                width: 10px;
+                height: 10px;
+            }
+            /* 调整移动端装饰点位置 */
+            .cake-decoration .decoration-dot:nth-child(1) { top: 25px; left: 30px; }
+            .cake-decoration .decoration-dot:nth-child(2) { top: 35px; left: 70px; }
+            .cake-decoration .decoration-dot:nth-child(3) { top: 20px; left: 115px; }
+            .cake-decoration .decoration-dot:nth-child(4) { top: 40px; left: 155px; }
+            .cake-decoration .decoration-dot:nth-child(5) { top: 60px; left: 50px; }
+            .cake-decoration .decoration-dot:nth-child(6) { top: 55px; left: 140px; }
+            .candle {
+                top: -15px;
+                width: 15px;
+                height: 35px;
+            }
+            .flame {
+                top: -33px;
+                width: 15px;
+                height: 18px;
+            }
+        }
+        
+        /* 针对小屏幕手机的额外调整 */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 20px;
+            }
+            button {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+                margin-bottom: 60px;
+            }
+            .cake {
+                width: 160px;
+                height: 110px;
+            }
+            .cake-base {
+                width: 160px;
+                height: 65px;
+            }
+            .cake-cream {
+                bottom: 55px;
+                width: 135px;
+                height: 30px;
+                left: 12.5px;
+            }
+            .decoration-dot {
+                width: 8px;
+                height: 8px;
+            }
+            /* 调整小屏幕装饰点位置 */
+            .cake-decoration .decoration-dot:nth-child(1) { top: 20px; left: 25px; }
+            .cake-decoration .decoration-dot:nth-child(2) { top: 30px; left: 55px; }
+            .cake-decoration .decoration-dot:nth-child(3) { top: 15px; left: 90px; }
+            .cake-decoration .decoration-dot:nth-child(4) { top: 35px; left: 120px; }
+            .cake-decoration .decoration-dot:nth-child(5) { top: 50px; left: 40px; }
+            .cake-decoration .decoration-dot:nth-child(6) { top: 45px; left: 110px; }
+            .candle {
+                top: -15px;
+                width: 15px;
+                height: 35px;
+            }
+            .flame {
+                top: -17px;
+                width: 15px;
+                height: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>殷秦 生日快乐 岁岁平安 身体健康</h1>
+<button id="fireworkBtn">请点击我</button>
+
+<!-- 蛋糕元素 - 确保代码存在 -->
+<div class="cake">
+    <div class="cake-base"></div>
+    <div class="cake-cream"></div>
+    <div class="cake-decoration">
+        <div class="decoration-dot"></div>
+        <div class="decoration-dot"></div>
+        <div class="decoration-dot"></div>
+        <div class="decoration-dot"></div>
+        <div class="decoration-dot"></div>
+        <div class="decoration-dot"></div>
+    </div>
+    <div class="candle">
+        <div class="flame"></div>
+    </div>
+</div>
+
+<script>
+    // 获取按钮元素
+    const fireworkBtn = document.getElementById('fireworkBtn');
+    let isFiring = false;
+    const particlePool = [];
+    const threadPool = [];
+    const fireworkPool = [];
+    const MAX_POOL_SIZE = 100;
+
+    // 点击按钮生成烟花（修复发射起点）
+    fireworkBtn.addEventListener('click', function(e) {
+        if (isFiring) return;
+        isFiring = true;
+
+        const btnRect = fireworkBtn.getBoundingClientRect();
+        const btnCenterX = btnRect.left + (btnRect.width / 2);
+        const btnCenterY = btnRect.top + (btnRect.height / 2);
+
+        // 生成10个大小不一的烟花（错开生成时间）
+        let fireworkIndex = 0;
+        const fireworkInterval = setInterval(() => {
+            if (fireworkIndex >= 10) {
+                clearInterval(fireworkInterval);
+                setTimeout(() => {
+                    isFiring = false;
+                }, 1000);
+                return;
+            }
+            const fireworkSize = Math.random() * 15 + 15;
+            createFirework(btnCenterX, btnCenterY, fireworkSize);
+            fireworkIndex++;
+        }, 100);
+    });
+
+    function getParticleFromPool() {
+        if (particlePool.length > 0) {
+            const particle = particlePool.pop();
+            particle.style.opacity = '1';
+            return particle;
+        }
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        return particle;
+    }
+
+    function recycleParticle(particle) {
+        if (particlePool.length < MAX_POOL_SIZE) {
+            particlePool.push(particle);
+        } else {
+            particle.remove();
+        }
+    }
+
+    function getThreadFromPool() {
+        if (threadPool.length > 0) {
+            const thread = threadPool.pop();
+            thread.style.opacity = '0.9';
+            return thread;
+        }
+        const thread = document.createElement('div');
+        thread.className = 'firework-thread';
+        return thread;
+    }
+
+    function recycleThread(thread) {
+        if (threadPool.length < MAX_POOL_SIZE) {
+            threadPool.push(thread);
+        } else {
+            thread.remove();
+        }
+    }
+
+    function getFireworkFromPool() {
+        if (fireworkPool.length > 0) {
+            const firework = fireworkPool.pop();
+            // 完全重置烟花样式，确保从对象池获取的烟花处于初始状态
+            firework.style.transition = 'none'; // 暂时禁用过渡效果
+            firework.style.left = '0';
+            firework.style.top = '0';
+            firework.style.opacity = '0';
+            firework.style.transform = 'scale(1)';
+            return firework;
+        }
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        return firework;
+    }
+
+    function recycleFirework(firework) {
+        // 重置烟花样式，确保下次使用时从正确位置开始
+        firework.style.left = '0';
+        firework.style.top = '0';
+        firework.style.opacity = '0';
+        firework.style.transform = 'scale(1)';
+        
+        if (fireworkPool.length < 20) {
+            fireworkPool.push(firework);
+        } else {
+            firework.remove();
+        }
+    }
+
+    function createFirework(startX, startY, fireworkSize) {
+        const firework = getFireworkFromPool();
+
+        // 移除之前的过渡效果
+        firework.style.transition = 'none';
+        
+        // 设置初始样式
+        firework.style.width = `${fireworkSize}px`;
+        firework.style.height = `${fireworkSize}px`;
+        firework.style.backgroundColor = '#ffd700';
+        firework.style.boxShadow = `0 0 10px #ffd700`;
+
+        // 确保从按钮位置开始
+        const initialX = startX - (fireworkSize / 2);
+        const initialY = startY - (fireworkSize / 2);
+        firework.style.left = `${initialX}px`;
+        firework.style.top = `${initialY}px`;
+        firework.style.opacity = '1';
+        firework.style.transform = 'scale(1)';
+
+        // 添加到DOM
+        if (!firework.parentNode) {
+            document.body.appendChild(firework);
+        }
+
+        // 计算目标位置
+        const maxX = window.innerWidth - fireworkSize;
+        const maxY = window.innerHeight - fireworkSize;
+        const targetX = Math.random() * maxX;
+        const targetY = Math.random() * maxY;
+
+        // 使用JavaScript动画代替CSS过渡，确保精确控制
+        const duration = 1800; // 动画持续时间（毫秒）
+        const startTime = Date.now();
+        
+        // 动画函数
+        function animate() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // 缓动函数
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            
+            // 更新位置
+            const currentX = initialX + (targetX - initialX) * easeOut;
+            const currentY = initialY + (targetY - initialY) * easeOut;
+            
+            firework.style.left = `${currentX}px`;
+            firework.style.top = `${currentY}px`;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // 动画结束，开始爆炸效果
+                setTimeout(() => {
+                    firework.style.opacity = '0';
+                    firework.style.transform = 'scale(1.5)';
+
+                    const explosionX = targetX + (fireworkSize / 2);
+                    const explosionY = targetY + (fireworkSize / 2);
+                    createExplosion(explosionX, explosionY, fireworkSize);
+
+                    setTimeout(() => {
+                        recycleFirework(firework);
+                    }, 800);
+                }, 100);
+            }
+        }
+        
+        // 启动动画
+        requestAnimationFrame(animate);
+    }
+
+    function createExplosion(x, y, fireworkSize) {
+        const particleCount = Math.floor(Math.random() * 10) + 40;
+        // createFireworkThreads(x, y, particleCount / 4); // 移除线条爆炸特效调用
+
+        for (let i = 0; i < particleCount; i++) {
+            const particleSize = Math.random() * 3 + 3;
+            createExplosionParticle(x, y, particleSize, fireworkSize, i);
+        }
+    }
+
+    function createExplosionParticle(centerX, centerY, particleSize, fireworkSize, index) {
+        const particle = getParticleFromPool();
+
+        particle.style.width = `${particleSize}px`;
+        particle.style.height = `${particleSize}px`;
+
+        const hue = Math.floor(Math.random() * 30) + 30;
+        particle.style.background = `hsl(${hue}, 100%, 70%)`;
+        const shadowSize = particleSize * 3;
+        particle.style.boxShadow = `0 0 ${shadowSize}px hsl(${hue}, 100%, 70%)`;
+
+        particle.style.animation = `flicker 0.8s ease-out forwards`;
+
+        particle.style.left = `${centerX - (particleSize / 2)}px`;
+        particle.style.top = `${centerY - (particleSize / 2)}px`;
+
+        if (!particle.parentNode) {
+            document.body.appendChild(particle);
+        }
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 200 + 200;
+
+        // 计算目标位置，并确保在屏幕范围内
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const targetX = Math.max(0, Math.min(centerX + Math.cos(angle) * distance - (particleSize / 2), screenWidth - particleSize));
+        const targetY = Math.max(0, Math.min(centerY + Math.sin(angle) * distance - (particleSize / 2), screenHeight - particleSize));
+
+        setTimeout(() => {
+            particle.style.left = `${targetX}px`;
+            particle.style.top = `${targetY}px`;
+            particle.style.transform = `scale(${Math.random() * 1.2 + 0.8})`;
+
+            setTimeout(() => {
+                recycleParticle(particle);
+            }, 800);
+        }, 10 + (index * 2));
+    }
+
+    window.addEventListener('resize', function() {
+        if (this.resizeTimer) clearTimeout(this.resizeTimer);
+        this.resizeTimer = setTimeout(() => {
+            const elements = document.querySelectorAll('.firework, .particle, .firework-thread');
+            elements.forEach(element => {
+                const currentX = parseFloat(element.style.left);
+                const currentY = parseFloat(element.style.top);
+
+                if (currentX > window.innerWidth || currentY > window.innerHeight || currentX < 0 || currentY < 0) {
+                    if (element.classList.contains('particle')) {
+                        recycleParticle(element);
+                    } else if (element.classList.contains('firework-thread')) {
+                        recycleThread(element);
+                    } else if (element.classList.contains('firework')) {
+                        recycleFirework(element);
+                    }
+                }
+            });
+        }, 200);
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            const allElements = document.querySelectorAll('.firework, .particle, .firework-thread');
+            allElements.forEach(el => {
+                el.style.transition = 'none';
+            });
+        } else {
+            const allElements = document.querySelectorAll('.firework, .particle, .firework-thread');
+            allElements.forEach(el => {
+                el.style.transition = '';
+            });
+        }
+    });
+</script>
+</body>
+</html>
